@@ -1,28 +1,41 @@
 package com.vm.hibarnate.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.vm.hibarnate.converter.BirthdayConverter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@ToString(exclude = {"company", "profile", "userChats"})
 @Entity
-@Table(name = "users", schema = "hiber")
+@Table(name = "\"user\"", schema = "hiber")
+@Builder
+@EntityScan()
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "username")
     private String userName;
-    private String firstName;
-    private String lastName;
-    @Column(name = "birthdate")
-    private LocalDate birthDay;
-    private Integer age;
+    @Embedded
+    private PersonalInfo personalInfo;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Profile profile;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user")
+    private List<UserChat> userChats = new ArrayList<>();
 }
