@@ -8,12 +8,23 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@NamedQuery(name = "findByCompany", query = """
+        select u from User u 
+        left join u.company c
+        where c.name = :name
+        """)
+
+@NamedQuery(name = "update", query = """
+        update User u set  personalInfo.firstName=:newFirstName
+        where u.personalInfo.firstName =:oldName
+        """)
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"company", "profile", "userChats"})
 @Entity
-@Table(name = "\"user\"", schema = "hiber")
+@Table(name = "users", schema = "hiber")
 @Builder
 @EntityScan()
 public class User {

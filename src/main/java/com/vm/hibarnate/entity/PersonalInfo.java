@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Embeddable
-@Table(name = "\"user\"", schema = "hiber")
+@Table(name = "users", schema = "hiber")
 public class PersonalInfo {
     @Column(name = "firstname")
     private String firstName;
