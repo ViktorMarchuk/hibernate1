@@ -1,24 +1,44 @@
-package com.vm.hibarnate;
+package com.vm.hibarnate.runner;
 
 import com.vm.hibarnate.entity.*;
 import com.vm.hibarnate.util.HibernateUtil;
 import lombok.Cleanup;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
+@Slf4j
 public class HibernateRunnerTest {
     @Test
     public void checkHQL() {
         @Cleanup var sessionFactory = HibernateUtil.getSessionFactory();
         @Cleanup var session = sessionFactory.openSession();
+        String name = "Audi";
         session.beginTransaction();
-        var users = session.createQuery("select u from User u").list();
+        var users = session.createNamedQuery("findByCompany")
+                .setParameter("name", name)
+                .getResultList();
+        System.out.println("List of users : " + users);
+        System.out.println("Number of Users: " + users.size());
+        session.flush();
+        session.getTransaction().commit();
 
-        for (Object us : users)
-            System.out.println(us);
+    }
+
+    @Test
+    public void checkUpdateHQL() {
+        @Cleanup var sessionFactory = HibernateUtil.getSessionFactory();
+        @Cleanup var session = sessionFactory.openSession();
+        String nameToUpdate = "Peter";
+        String oldName="Donald";
+        session.beginTransaction();
+        var user = session.createNamedQuery("update")
+                .setParameter("newFirstName",nameToUpdate)
+                .setParameter("oldName",oldName)
+                .executeUpdate();
 
         session.getTransaction().commit();
 
@@ -26,19 +46,19 @@ public class HibernateRunnerTest {
 
     @Test
     public void checkInheritance() {
-//        @Cleanup var sessionFactory = HibernateUtil.getSessionFactory();
-//        @Cleanup var session = sessionFactory.openSession();
-//        session.beginTransaction();
-//        Company company = Company.builder()
-//                .name("Audi")
-//                .build();
-//        session.persist(company);
-//
-//
-//        session.flush();
-//        session.clear();
-//
-//        session.getTransaction().commit();
+        @Cleanup var sessionFactory = HibernateUtil.getSessionFactory();
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+        Company company = Company.builder()
+                .name("Porshe")
+                .build();
+        session.persist(company);
+
+
+        session.flush();
+        session.clear();
+
+        session.getTransaction().commit();
     }
 
     @Test
@@ -50,7 +70,8 @@ public class HibernateRunnerTest {
                 .name("Mazda")
                 .build();
         session.persist(company);
-
+        session.flush();
+        log.info("Company {} saved  with ID{}", company.getName(), company.getId());
         session.getTransaction().commit();
     }
 
@@ -80,17 +101,17 @@ public class HibernateRunnerTest {
     @Test
     public void testOneToOne() {
         var user = (User.builder()
-                .userName("Stop")
+                .userName("Ocean")
                 .personalInfo(PersonalInfo.builder()
-                        .firstName("Wena")
+                        .firstName("LOt")
                         .lastName("Maduk")
                         .birthDay(new Birthday(LocalDate.of(1982, 8, 12)))
                         .build())
                 .role(Role.USER)
                 .build());
         var profile = Profile.builder()
-                .language("PL")
-                .street("Skoriny")
+                .language("BY")
+                .street("Korpaty")
                 .build();
 
         @Cleanup var sessionFactory = HibernateUtil.getSessionFactory();
@@ -100,6 +121,7 @@ public class HibernateRunnerTest {
         session.persist(user);
         profile.setUser(user);
         session.persist(profile);
+        log.info("User {} added DB", user.getUserName());
 
         session.getTransaction().commit();
 
