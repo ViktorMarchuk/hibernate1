@@ -1,5 +1,6 @@
 package com.vm.hibarnate.entity;
 
+import com.querydsl.core.annotations.QueryEntity;
 import com.vm.hibarnate.converter.BirthdayConverter;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ import java.util.List;
 @Table(name = "users", schema = "hiber")
 @Builder
 @EntityScan()
+@QueryEntity
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
