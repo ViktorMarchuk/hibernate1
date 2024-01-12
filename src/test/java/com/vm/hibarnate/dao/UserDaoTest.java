@@ -66,8 +66,8 @@ public class UserDaoTest {
 //        List<User> users = session.createQuery(criteria).list();
 //        log.info("List of user from test {]", users);
         List<User> fromDB = userDao.findAll(session);
-        List<String> expected = Arrays.asList("Don", "Kot");
-        Assert.assertEquals(fromDB.size(), 2);
+        List<String> expected = Arrays.asList("Kot", "Don", "Lena");
+        Assert.assertEquals(fromDB.size(), 3);
         List<String> name = fromDB.stream()
                 .map(user -> user.getPersonalInfo().getFirstName())
                 .collect(Collectors.toList());
