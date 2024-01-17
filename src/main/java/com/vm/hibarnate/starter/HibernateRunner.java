@@ -21,5 +21,6 @@ import java.util.List;
 public class HibernateRunner {
 
     public static void main(String[] args) {
+
     }
 }
