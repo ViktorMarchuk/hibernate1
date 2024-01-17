@@ -1,7 +1,6 @@
 package com.vm.hibarnate.entity;
 
-import com.querydsl.core.annotations.QueryEntity;
-import com.vm.hibarnate.converter.BirthdayConverter;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,12 +22,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = {"company", "profile", "userChats"})
+@ToString(exclude = {"company", "profile", "userChats", "payments"})
 @Entity
 @Table(name = "users", schema = "hiber")
 @Builder
 @EntityScan()
-@QueryEntity
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,4 +49,8 @@ public class User {
     @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<UserChat> userChats = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Payment> payments = new ArrayList<>();
+
 }

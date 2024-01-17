@@ -1,5 +1,7 @@
 package com.vm.hibarnate.dao;
 
+import com.vm.hibarnate.dto.PaymentFilter;
+import com.vm.hibarnate.entity.Payment;
 import com.vm.hibarnate.entity.User;
 import com.vm.hibarnate.util.HibernateUtil;
 import com.vm.hibarnate.util.TestDataImporter;
@@ -56,6 +58,66 @@ public class UserDaoQueryDSLTest {
         Optional<String> actual = users.stream().map(user -> user.getPersonalInfo().getLastName()).findFirst();
         Assertions.assertEquals(excepted, actual.get());
         log.info("Result: {}", actual);
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void findLimitUserOrderByBirthdayTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        int limit = 3;
+        List<String> expected = Arrays.asList("Minsk", "Ocean", "Stop");
+        session.beginTransaction();
+        List<User> users = userDaoQueryDSL.findLimitUserOrderByBirthday(session, limit);
+        log.info("List of users:{}", users);
+        List<String> actual = users.stream().map(user -> user.getUserName()).sorted().collect(Collectors.toList());
+        log.info("List of users:{}", actual);
+        Assertions.assertEquals(expected, actual, "Test not pass");
+
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void findAllBuCompanyNameTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+        String companyName = "Porshe";
+        List<User> users = userDaoQueryDSL.findAllByCompanyName(session, companyName);
+        log.info("List of users:{}", users);
+
+        Optional<String> actual = users.stream().map(user -> user.getCompany().getName()).findFirst();
+        log.info("Company name : {}", actual.get());
+
+        Assertions.assertEquals(actual.get(), companyName, "Test not pass");
+
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void findAllPaymentsByCompanyNameTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+        String companyName = "Audi";
+        List<Integer> expected = Arrays.asList(600, 550);
+        List<Payment> payments = userDaoQueryDSL.findAllPaymentsByCompanyName(session, companyName);
+        log.info("Payments received by company name:{}", payments);
+        List<Integer> actual = payments.stream().map(payment -> payment.getAmount()).collect(Collectors.toList());
+        log.info("List of amount of payment(s):{}", actual);
+        Assertions.assertEquals(expected, actual, "Test not pass with expected amount " + expected);
+
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void findAverageAmountByCompanyNameTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        session.beginTransaction();
+        double expected = 575.0;
+        double actual = userDaoQueryDSL
+                .findAverageAmountByCompanyName(session, PaymentFilter.builder()
+                .company("Audi")
+                .build());
+        log.info("Average amount by company:{}", actual);
+        Assertions.assertEquals(expected, actual);
         session.getTransaction().commit();
     }
 }
