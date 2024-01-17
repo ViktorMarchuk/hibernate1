@@ -5,6 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.vm.hibarnate.dto.PaymentFilter;
+import com.vm.hibarnate.dto.QPredicate;
 import com.vm.hibarnate.entity.Payment;
 import com.vm.hibarnate.entity.User;
 import org.hibernate.Session;
@@ -66,17 +67,24 @@ public class UserDaoQueryDSL {
                 .fetch();
     }
 
+
     public Double findAverageAmountByCompanyName(Session session, PaymentFilter filter) {
-        List<Predicate> predicates = new ArrayList<>();
-        if(filter.getCompany()!=null)
-            predicates.add(user.company.name.eq(filter.getCompany()));
+
+//        List<Predicate> predicates = new ArrayList<>();
+//        if (filter.getCompany() != null)
+//            predicates.add(user.company.name.eq(filter.getCompany()));
+
+        var predicate = QPredicate
+                .builder()
+                .add(filter.getCompany(), user.company.name::eq)
+                .buildAnd();
 
         return new JPAQuery<Double>(session)
                 .select(payment.amount.avg())
                 .from(payment)
                 .join(payment.user)
                 .join(user.company)
-                .where(predicates.toArray(Predicate[]::new))
+                .where(predicate)
                 .fetchOne();
     }
 }
