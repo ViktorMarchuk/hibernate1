@@ -7,6 +7,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @NamedQuery(name = "findByCompany", query = """
         select u from User u 
@@ -27,6 +28,7 @@ import java.util.List;
 @Table(name = "users", schema = "hiber")
 @Builder
 @EntityScan()
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,8 +45,8 @@ public class User {
     @JoinColumn(name = "company_id")
     private Company company;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Profile profile;
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//    private Profile profile;
 
     @Builder.Default
     @OneToMany(mappedBy = "user")
