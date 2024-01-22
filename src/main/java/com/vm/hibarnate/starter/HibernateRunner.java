@@ -1,6 +1,7 @@
 package com.vm.hibarnate.starter;
 
 import com.vm.hibarnate.converter.BirthdayConverter;
+import com.vm.hibarnate.dao.PaymentRepository;
 import com.vm.hibarnate.dao.UserDao;
 import com.vm.hibarnate.entity.*;
 import com.vm.hibarnate.util.HibernateUtil;
@@ -21,6 +22,13 @@ import java.util.List;
 public class HibernateRunner {
 
     public static void main(String[] args) {
+        var sessionFactory = HibernateUtil.getSessionFactory();
+        var session = sessionFactory.openSession();
+        session.beginTransaction();
+        var paymentRepo = new PaymentRepository(sessionFactory, Payment.class);
+        paymentRepo.findById(1).ifPresent(System.out::println);
 
+        session.getTransaction().commit();
     }
 }
+

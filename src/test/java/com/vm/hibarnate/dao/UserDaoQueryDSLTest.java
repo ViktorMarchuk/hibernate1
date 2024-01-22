@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public class UserDaoQueryDSLTest {
+
     private final UserDaoQueryDSL userDaoQueryDSL = UserDaoQueryDSL.getInstance();
     private static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
@@ -35,7 +36,7 @@ public class UserDaoQueryDSLTest {
     }
 
     @Test
-    public void findAllUsersTest() {
+    void findAllUsersTest() {
         @Cleanup var session = sessionFactory.openSession();
         session.beginTransaction();
         List<User> users = userDaoQueryDSL.findAllUsers(session);
@@ -49,7 +50,7 @@ public class UserDaoQueryDSLTest {
     }
 
     @Test
-    public void findByLastNameTest() {
+    void findByLastNameTest() {
         @Cleanup var session = sessionFactory.openSession();
         String excepted = "Grud";
         session.beginTransaction();
@@ -114,10 +115,35 @@ public class UserDaoQueryDSLTest {
         double expected = 575.0;
         double actual = userDaoQueryDSL
                 .findAverageAmountByCompanyName(session, PaymentFilter.builder()
-                .company("Audi")
-                .build());
+                        .company("Audi")
+                        .build());
         log.info("Average amount by company:{}", actual);
         Assertions.assertEquals(expected, actual);
         session.getTransaction().commit();
+    }
+
+    @Test
+    void findLimitByBirthdayOrderTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        int limit = 3;
+        session.beginTransaction();
+        List<User> users = userDaoQueryDSL.findLimitUserOrderByBirthday(session, limit);
+        log.info("Find users by birthday:{}", users);
+        Assertions.assertEquals(users.size(), limit);
+        session.getTransaction().commit();
+    }
+
+    @Test
+    void findAllByCompanyNameTest() {
+        @Cleanup var session = sessionFactory.openSession();
+        String companyName = "Audi";
+        List<String> expected = Arrays.asList("Stop", "Minsk");
+        List<User> users = userDaoQueryDSL.findAllByCompanyName(session, companyName);
+        log.info("List of users find by company name: {}", users);
+        List<String> actual = users.stream().map(user -> user.getUserName()).collect(Collectors.toList());
+        log.info("List of user name:{}", actual);
+        Assertions.assertEquals(actual, expected);
+        session.beginTransaction();
+
     }
 }

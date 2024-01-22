@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Data
 @Entity
@@ -16,6 +17,8 @@ import java.util.Set;
 @Table(name = "company", schema = "hiber")
 @EqualsAndHashCode(of = "name")
 @ToString(exclude = "name")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+
 public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
